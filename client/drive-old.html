@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!-- גרסה ישנה של מסך הדרייב. הוחלפה ע"י dashboard.html ואינה בשימוש. -->
+<html lang="he"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Aura Drive</title><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={theme:{extend:{colors:{"surface-container":"#e5eeff","surface-container-low":"#eff4ff","error-container":"#ffdad6","surface-container-high":"#dce9ff","primary":"#001026","secondary-fixed":"#cce5ff","surface-container-lowest":"#ffffff","on-surface":"#0b1c30","on-surface-variant":"#44474e","error":"#ba1a1a","on-secondary-fixed":"#001d31","primary-container":"#0b2545","surface":"#f8f9ff","secondary":"#006398","background":"#f8f9ff","outline-variant":"#c4c6cf","on-error-container":"#93000a","on-primary":"#ffffff"},spacing:{"space-xs":"0.5rem","space-sm":"0.75rem","space-2xs":"0.25rem","space-lg":"1.5rem","space-md":"1rem","space-xl":"2rem"},fontFamily:{sans:["Manrope","system-ui","sans-serif"]}}}};</script></head>
+
+<body class="bg-background font-sans text-on-surface h-screen overflow-hidden" dir="rtl">
+
+<!-- מסך טעינה עד שידוע אם המשתמש מחובר -->
+<div class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-space-md bg-background" id="auth-gate">
+<div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center animate-pulse">
+<span class="material-symbols-outlined text-on-primary text-[28px]">cloud</span>
+</div>
+<p class="text-[14px] text-on-surface-variant">טוען...</p>
+</div>
+
+<div class="h-screen flex flex-col">
+
+<!-- ===== סרגל עליון ===== -->
+<header class="h-16 shrink-0 bg-surface border-b border-outline-variant/40 flex items-center justify-between px-space-lg">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-[20px]">cloud</span>
+</div>
+<span class="text-[20px] font-bold text-primary">Aura Drive</span>
+</div>
+
+<div class="flex items-center gap-space-sm">
+<img alt="" class="w-9 h-9 rounded-full bg-surface-container-high object-cover hidden" id="user-avatar"/>
+<span class="text-[14px] font-semibold text-on-surface" id="user-name"></span>
+<button class="w-9 h-9 rounded-full bg-surface-container-low hover:bg-error-container hover:text-on-error-container text-on-surface-variant flex items-center justify-center transition-colors" id="btn-logout" title="התנתקות" type="button">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+</button>
+</div>
+</header>
+
+<!-- ===== אזור ראשי ===== -->
+<main class="flex-1 flex flex-col items-center justify-center text-center gap-space-md px-space-lg">
+<div class="w-20 h-20 rounded-xl bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant text-[40px]">folder_open</span>
+</div>
+<div>
+<p class="text-[18px] font-semibold text-on-surface mb-space-2xs">הדרייב שלך ריק</p>
+<p class="text-[14px] text-on-surface-variant">העלאת קבצים עדיין לא נבנתה</p>
+</div>
+</main>
+
+</div>
+
+<script type="module">
+  import { getCurrentUser, logout } from "./api.js";
+
+  const LOGIN_PAGE = "index.html";
+
+  // שומר הדף: מי שלא מחובר מוחזר למסך ההתחברות
+  const user = await getCurrentUser();
+
+  if (!user) {
+    window.location.replace(LOGIN_PAGE);
+  } else {
+    document.getElementById('user-name').innerText =
+      user.fullName || (user.email ? user.email.split('@')[0] : 'משתמש');
+
+    if (user.photoUrl) {
+      const avatar = document.getElementById('user-avatar');
+      avatar.src = user.photoUrl;
+      avatar.classList.remove('hidden');
+    }
+
+    document.getElementById('auth-gate').remove();
+  }
+
+  document.getElementById('btn-logout').addEventListener('click', async () => {
+    try { await logout(); } catch (err) { console.error("Logout failed:", err); }
+    window.location.replace(LOGIN_PAGE);
+  });
+</script>
+
+</body></html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="he"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Aura Drive</title><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@100..900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={theme:{extend:{colors:{"secondary-fixed":"#cce5ff","on-secondary-fixed":"#001d31","surface":"#f8f9ff","on-secondary-container":"#00476e","outline":"#74777f","on-secondary":"#ffffff","on-error-container":"#93000a","surface-container-low":"#eff4ff","error-container":"#ffdad6","background":"#f8f9ff","primary-container":"#0b2545","error":"#ba1a1a","on-primary":"#ffffff","on-surface":"#0b1c30","surface-container":"#e5eeff","surface-container-high":"#dce9ff","outline-variant":"#c4c6cf","on-surface-variant":"#44474e","primary":"#001026","secondary-container":"#5bb8fe","secondary":"#006398","surface-container-lowest":"#ffffff"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"space-sm":"0.75rem","space-xs":"0.5rem","space-2xs":"0.25rem","space-xl":"2rem","space-lg":"1.5rem","space-md":"1rem","space-2xl":"2.5rem"},fontFamily:{"headline-md":["Manrope"],"body-sm":["Manrope"],"label-md":["Manrope"],"label-lg":["Manrope"],"body-md":["Manrope"],"title-sm":["Manrope"]},fontSize:{"headline-md":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0.01em","fontWeight":"400"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"600"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}],"title-sm":["18px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"600"}]}}}}</script></head>
+
+<body class="bg-surface font-body-md text-on-surface antialiased" dir="rtl">
+
+<!-- מסך טעינה עד שידוע אם המשתמש מחובר -->
+<div class="fixed inset-0 z-[60] flex flex-col items-center justify-center gap-space-md bg-surface" id="auth-gate">
+<div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center animate-pulse">
+<span class="material-symbols-outlined text-on-primary text-[28px]">cloud</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">טוען...</p>
+</div>
+
+<!-- ===== סרגל עליון ===== -->
+<header class="fixed top-0 inset-x-0 h-16 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex items-center justify-between px-space-lg">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-[20px]">cloud</span>
+</div>
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">Aura Drive</span>
+</div>
+
+<div class="flex items-center gap-space-sm">
+<span class="font-label-lg text-label-lg text-on-surface font-semibold hidden md:inline-block" id="user-name"></span>
+<img alt="" class="w-8 h-8 rounded-full bg-surface-container-high object-cover hidden" id="user-avatar"/>
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center" id="user-avatar-fallback">
+<span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+</div>
+<button aria-label="התנתקות" class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-error-container hover:text-on-error-container transition-colors" id="btn-logout" title="התנתקות" type="button">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+</button>
+</div>
+</header>
+
+<div class="flex min-h-screen">
+
+<!-- ===== תפריט צד ===== -->
+<aside class="fixed top-16 inset-inline-start-0 bottom-0 w-60 bg-surface shadow-[0_1px_8px_rgba(0,0,0,0.02)] z-40 hidden lg:flex flex-col p-space-md">
+<nav class="flex flex-col gap-space-2xs">
+<span class="flex items-center gap-space-sm px-space-md py-space-sm rounded-full bg-surface-container-low text-secondary font-bold">
+<span class="material-symbols-outlined text-[20px]">folder</span>
+<span class="font-label-lg text-label-lg">הדרייב שלי</span>
+</span>
+</nav>
+</aside>
+
+<!-- ===== אזור ראשי ===== -->
+<div class="flex-1 w-full lg:ps-60">
+<main class="w-full pt-16 min-h-screen bg-surface">
+
+<!-- פרטי החשבון -->
+<section class="px-space-xl pt-space-xl">
+<div class="max-w-[720px] bg-surface-container-lowest rounded-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] p-space-xl">
+<h2 class="font-title-sm text-title-sm text-primary font-bold mb-space-md flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[20px]">account_circle</span>
+פרטי החשבון
+</h2>
+<dl class="grid sm:grid-cols-2 gap-space-md">
+<div class="flex flex-col gap-space-2xs">
+<dt class="font-label-md text-label-md text-on-surface-variant">שם מלא</dt>
+<dd class="font-body-md text-body-md text-on-surface" id="info-name">—</dd>
+</div>
+<div class="flex flex-col gap-space-2xs">
+<dt class="font-label-md text-label-md text-on-surface-variant">כתובת אימייל</dt>
+<dd class="font-body-md text-body-md text-on-surface" dir="ltr" style="text-align:right" id="info-email">—</dd>
+</div>
+<div class="flex flex-col gap-space-2xs">
+<dt class="font-label-md text-label-md text-on-surface-variant">מזהה משתמש</dt>
+<dd class="font-body-sm text-body-sm text-on-surface-variant break-all" dir="ltr" style="text-align:right" id="info-uid">—</dd>
+</div>
+<div class="flex flex-col gap-space-2xs">
+<dt class="font-label-md text-label-md text-on-surface-variant">אימות אימייל</dt>
+<dd class="font-body-md text-body-md" id="info-verified">—</dd>
+</div>
+</dl>
+</div>
+</section>
+
+<!-- הקבצים שלי -->
+<section class="px-space-xl py-space-xl">
+<div class="max-w-[720px] flex flex-col gap-space-md">
+
+<div class="flex items-center justify-between gap-space-md">
+<h2 class="font-title-sm text-title-sm text-primary font-bold flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[20px]">folder</span>
+הקבצים שלי
+</h2>
+<label class="h-10 px-space-md rounded-full bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg shadow-md flex items-center gap-space-xs cursor-pointer transition-all">
+<span class="material-symbols-outlined text-[18px]">upload</span>
+<span>העלאת קובץ</span>
+<input class="hidden" id="file-input" type="file"/>
+</label>
+</div>
+
+<!-- הודעת מצב -->
+<div class="hidden" id="upload-message" role="alert">
+<span class="material-symbols-outlined text-[18px]" id="upload-message-icon">error</span>
+<span id="upload-message-text"></span>
+</div>
+
+<!-- רשימת הקבצים -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] overflow-hidden" id="files-card">
+<div class="p-space-xl text-center text-on-surface-variant font-body-md text-body-md" id="files-empty">
+טוען...
+</div>
+<ul class="hidden divide-y divide-outline-variant/30" id="files-list"></ul>
+</div>
+
+</div>
+</section>
+
+</main>
+</div>
+</div>
+
+<script type="module">
+  import { getCurrentUser, logout, uploadFile, listFiles, deleteFile, fileDownloadUrl } from "./api.js";
+
+  const LOGIN_PAGE = "index.html";
+
+  // שומר הדף: מי שלא מחובר מוחזר למסך ההתחברות
+  const user = await getCurrentUser();
+
+  if (!user) {
+    window.location.replace(LOGIN_PAGE);
+  } else {
+    const shortName = user.fullName || (user.email ? user.email.split('@')[0] : 'משתמש');
+
+    document.getElementById('user-name').innerText = shortName;
+    document.getElementById('info-name').innerText = user.fullName || '—';
+    document.getElementById('info-email').innerText = user.email || '—';
+    document.getElementById('info-uid').innerText = user.id;
+
+    const verified = document.getElementById('info-verified');
+    verified.innerText = user.emailVerified ? 'מאומת' : 'ממתין לאימות';
+    verified.className = user.emailVerified
+      ? 'font-body-md text-body-md text-secondary font-bold'
+      : 'font-body-md text-body-md text-error font-bold';
+
+    if (user.photoUrl) {
+      const avatar = document.getElementById('user-avatar');
+      avatar.src = user.photoUrl;
+      avatar.classList.remove('hidden');
+      document.getElementById('user-avatar-fallback').classList.add('hidden');
+    }
+
+    document.getElementById('auth-gate').remove();
+    loadFiles();
+  }
+
+  // ---------- קבצים ----------
+
+  function showMessage(text, kind) {
+    const box = document.getElementById('upload-message');
+    document.getElementById('upload-message-icon').innerText = kind === 'success' ? 'check_circle' : 'error';
+    document.getElementById('upload-message-text').innerText = text;
+    box.className = kind === 'success'
+      ? 'flex items-center gap-space-xs rounded-lg bg-secondary-fixed px-space-md py-space-sm text-on-secondary-fixed font-body-sm text-body-sm'
+      : 'flex items-center gap-space-xs rounded-lg bg-error-container px-space-md py-space-sm text-on-error-container font-body-sm text-body-sm';
+  }
+
+  function clearMessage() {
+    document.getElementById('upload-message').className = 'hidden';
+  }
+
+  function formatSize(bytes) {
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let value = bytes, i = 0;
+    while (value >= 1024 && i < units.length - 1) { value /= 1024; i++; }
+    return value.toFixed(i === 0 ? 0 : 1) + ' ' + units[i];
+  }
+
+  function renderFiles(files) {
+    const list = document.getElementById('files-list');
+    const empty = document.getElementById('files-empty');
+
+    if (!files.length) {
+      list.className = 'hidden';
+      empty.className = 'p-space-xl text-center text-on-surface-variant font-body-md text-body-md';
+      empty.innerText = 'עדיין לא העלית קבצים';
+      return;
+    }
+
+    empty.className = 'hidden';
+    list.className = 'divide-y divide-outline-variant/30';
+    list.innerHTML = '';
+
+    for (const file of files) {
+      const item = document.createElement('li');
+      item.className = 'flex items-center gap-space-md px-space-md py-space-sm hover:bg-surface-container-low/60 transition-colors';
+      item.innerHTML = `
+        <span class="material-symbols-outlined text-secondary text-[22px]">draft</span>
+        <div class="flex-1 min-w-0">
+          <p class="font-label-lg text-label-lg text-on-surface truncate"></p>
+          <p class="font-body-sm text-body-sm text-on-surface-variant">${formatSize(file.size)}</p>
+        </div>
+        <a class="w-9 h-9 rounded-full hover:bg-surface-container text-on-surface-variant flex items-center justify-center transition-colors" href="${fileDownloadUrl(file.id)}" title="הורדה">
+          <span class="material-symbols-outlined text-[20px]">download</span>
+        </a>
+        <button class="w-9 h-9 rounded-full hover:bg-error-container text-on-surface-variant hover:text-on-error-container flex items-center justify-center transition-colors" title="מחיקה" type="button">
+          <span class="material-symbols-outlined text-[20px]">delete</span>
+        </button>`;
+
+      // הצבת השם כטקסט ולא כ-HTML, כדי ששם קובץ לא יוכל להריץ קוד
+      item.querySelector('p').innerText = file.name;
+
+      item.querySelector('button').addEventListener('click', async () => {
+        if (!confirm('למחוק את ' + file.name + '?')) return;
+        try {
+          await deleteFile(file.id);
+          await loadFiles();
+        } catch (error) {
+          showMessage(error.message);
+        }
+      });
+
+      list.appendChild(item);
+    }
+  }
+
+  async function loadFiles() {
+    try {
+      renderFiles(await listFiles());
+    } catch (error) {
+      document.getElementById('files-empty').innerText = error.message;
+    }
+  }
+
+  document.getElementById('file-input').addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    clearMessage();
+    showMessage('מעלה את ' + file.name + '...', 'success');
+
+    try {
+      await uploadFile(file);
+      showMessage('הקובץ הועלה בהצלחה', 'success');
+      await loadFiles();
+    } catch (error) {
+      showMessage(error.message);
+    }
+
+    event.target.value = ''; // כדי שאפשר יהיה להעלות שוב את אותו קובץ
+  });
+
+  document.getElementById('btn-logout').addEventListener('click', async () => {
+    try { await logout(); } catch (err) { console.error("Logout failed:", err); }
+    window.location.replace(LOGIN_PAGE);
+  });
+</script>
+
+</body></html>
