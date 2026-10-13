@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="he"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Aura Shield — ניהול</title><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={theme:{extend:{colors:{"surface-container":"#e5eeff","surface-container-low":"#eff4ff","error-container":"#ffdad6","primary":"#001026","secondary-fixed":"#cce5ff","surface-container-lowest":"#ffffff","on-surface":"#0b1c30","on-surface-variant":"#44474e","error":"#ba1a1a","on-secondary-fixed":"#001d31","primary-container":"#0b2545","surface":"#f8f9ff","secondary":"#006398","background":"#f8f9ff","outline-variant":"#c4c6cf","on-error-container":"#93000a"},fontFamily:{sans:["Manrope","system-ui","sans-serif"]}}}};</script></head>
+
+<body class="bg-background text-on-surface font-sans min-h-screen" dir="rtl">
+
+<header class="h-16 bg-primary text-white flex items-center justify-between px-8 shadow-md">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[24px]">admin_panel_settings</span>
+<span class="text-[20px] font-bold">אזור ניהול</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-[14px] opacity-80" id="admin-email"></span>
+<button class="h-9 px-4 rounded-full bg-white/10 hover:bg-white/20 text-[13px] font-semibold flex items-center gap-1.5 transition-colors" id="btn-refresh" type="button">
+<span class="material-symbols-outlined text-[16px]">refresh</span>רענון
+</button>
+</div>
+</header>
+
+<main class="max-w-[1100px] mx-auto p-8 flex flex-col gap-6">
+
+<!-- כרטיסיות סיכום -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-4" id="stats">
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm">
+<p class="text-[12px] font-semibold text-on-surface-variant mb-1">סך המשתמשים</p>
+<p class="text-[28px] font-extrabold text-primary" id="stat-total">—</p>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm">
+<p class="text-[12px] font-semibold text-on-surface-variant mb-1">מאומתים</p>
+<p class="text-[28px] font-extrabold text-secondary" id="stat-verified">—</p>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm">
+<p class="text-[12px] font-semibold text-on-surface-variant mb-1">דרך Google</p>
+<p class="text-[28px] font-extrabold text-secondary" id="stat-google">—</p>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm">
+<p class="text-[12px] font-semibold text-on-surface-variant mb-1">נרשמו השבוע</p>
+<p class="text-[28px] font-extrabold text-primary" id="stat-week">—</p>
+</div>
+</section>
+
+<!-- טבלת המשתמשים -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant/40 flex items-center justify-between">
+<h2 class="text-[18px] font-bold text-primary">משתמשים</h2>
+<input class="h-9 px-4 rounded-full bg-surface-container-low text-[13px] outline-none focus:shadow-[0_0_0_3px_rgba(91,184,254,0.35)] transition-all" id="filter" placeholder="סינון לפי אימייל או שם" type="text"/>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-[13px] text-right">
+<thead class="bg-surface-container-low text-on-surface-variant">
+<tr>
+<th class="px-6 py-3 font-semibold">אימייל</th>
+<th class="px-6 py-3 font-semibold">שם מלא</th>
+<th class="px-6 py-3 font-semibold">שיטה</th>
+<th class="px-6 py-3 font-semibold">אימות</th>
+<th class="px-6 py-3 font-semibold">נרשם</th>
+<th class="px-6 py-3 font-semibold">כניסה אחרונה</th>
+<th class="px-6 py-3"></th>
+</tr>
+</thead>
+<tbody id="users-body">
+<tr><td class="px-6 py-8 text-center text-on-surface-variant" colspan="7">טוען...</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+</main>
+
+<script>
+  const api = (path, options) => fetch('/api/admin' + path, { credentials: 'same-origin', ...options });
+
+  let allUsers = [];
+
+  function formatDate(value) {
+    if (!value) return '—';
+    return new Date(value).toLocaleString('he-IL', {
+      day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+  }
+
+  function renderUsers(users) {
+    const body = document.getElementById('users-body');
+
+    if (!users.length) {
+      body.innerHTML = '<tr><td class="px-6 py-8 text-center text-on-surface-variant" colspan="7">אין משתמשים להצגה</td></tr>';
+      return;
+    }
+
+    body.innerHTML = '';
+    for (const user of users) {
+      const row = document.createElement('tr');
+      row.className = 'border-b border-outline-variant/30 hover:bg-surface-container-low/60 transition-colors';
+      row.innerHTML = `
+        <td class="px-6 py-3" dir="ltr" style="text-align:right">${user.email}</td>
+        <td class="px-6 py-3">${user.fullName || '—'}</td>
+        <td class="px-6 py-3">${user.provider}</td>
+        <td class="px-6 py-3">${user.emailVerified
+          ? '<span class="text-secondary font-bold">מאומת</span>'
+          : '<span class="text-on-surface-variant">ממתין</span>'}</td>
+        <td class="px-6 py-3 text-on-surface-variant">${formatDate(user.createdAt)}</td>
+        <td class="px-6 py-3 text-on-surface-variant">${formatDate(user.lastLoginAt)}</td>
+        <td class="px-6 py-3 text-left">
+          <button class="w-8 h-8 rounded-full hover:bg-error-container text-on-surface-variant hover:text-on-error-container transition-colors" title="מחיקה" type="button">
+            <span class="material-symbols-outlined text-[18px] align-middle">delete</span>
+          </button>
+        </td>`;
+
+      row.querySelector('button').addEventListener('click', () => deleteUser(user));
+      body.appendChild(row);
+    }
+  }
+
+  async function deleteUser(user) {
+    if (!confirm('למחוק לצמיתות את ' + user.email + '?\n\nפעולה זו אינה הפיכה.')) return;
+
+    const response = await api('/users/' + user.id, { method: 'DELETE' });
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      alert((data && data.message) || 'המחיקה נכשלה');
+      return;
+    }
+    await load();
+  }
+
+  async function load() {
+    const [statsResponse, usersResponse] = await Promise.all([api('/stats'), api('/users')]);
+
+    if (!statsResponse.ok || !usersResponse.ok) {
+      document.getElementById('users-body').innerHTML =
+        '<tr><td class="px-6 py-8 text-center text-error" colspan="7">הטעינה נכשלה. ודא שאתה מחובר כאדמין.</td></tr>';
+      return;
+    }
+
+    const stats = await statsResponse.json();
+    document.getElementById('stat-total').innerText = stats.totalUsers;
+    document.getElementById('stat-verified').innerText = stats.verifiedUsers;
+    document.getElementById('stat-google').innerText = stats.googleUsers;
+    document.getElementById('stat-week').innerText = stats.newThisWeek;
+
+    allUsers = await usersResponse.json();
+    renderUsers(allUsers);
+  }
+
+  document.getElementById('filter').addEventListener('input', (event) => {
+    const term = event.target.value.trim().toLowerCase();
+    renderUsers(term
+      ? allUsers.filter(u => u.email.toLowerCase().includes(term) || (u.fullName || '').toLowerCase().includes(term))
+      : allUsers);
+  });
+
+  document.getElementById('btn-refresh').addEventListener('click', load);
+
+  load();
+</script>
+
+</body></html>
