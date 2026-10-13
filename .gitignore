@@ -1,0 +1,16 @@
+# .NET build output
+bin/
+obj/
+
+# local secrets (database password, Google keys)
+server/appsettings.Development.json
+
+# uploaded files
+server/storage/
+
+# JetBrains (Rider / DataGrip)
+.idea/
+*.user
+
+# Visual Studio
+.vs/
